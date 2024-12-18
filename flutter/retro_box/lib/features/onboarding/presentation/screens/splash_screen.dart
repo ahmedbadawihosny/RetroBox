@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:retro_box/core/constants/app_colors.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:retro_box/features/onboarding/presentation/screens/onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -21,7 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
   Future<void> _splashTime() async {
     // SharedPreferences prefs = await SharedPreferences.getInstance();
     // bool? hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
-    // await Future.delayed(const Duration(seconds: 10));
+    await Future.delayed(const Duration(seconds: 2));
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (_) => const OnboardingScreen()));
 
     // if (hasSeenOnboarding) {
     //   Navigator.of(context)

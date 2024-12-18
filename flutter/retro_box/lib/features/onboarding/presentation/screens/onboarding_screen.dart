@@ -8,6 +8,7 @@ import 'package:retro_box/features/onboarding/domain/entities/onboarding_entity.
 import 'package:retro_box/features/onboarding/domain/usecases/view_onboarding.dart';
 import 'package:retro_box/features/onboarding/presentation/widgets/get_onboarding.dart';
 import 'package:retro_box/features/onboarding/presentation/widgets/onboarding_btn.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -71,6 +72,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 contentPage(),
                 const Spacer(),
                 actionsPage(),
+                const SizedBox(
+                  height: 40,
+                ),
               ],
             ),
     );
@@ -78,7 +82,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   SizedBox contentPage() {
     return SizedBox(
-      height: 290,
+      height: 320,
       child: PageView.builder(
         onPageChanged: (index) => setState(() {
           isLastPage = onboardingItems.length - 1 == index;
@@ -107,8 +111,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         const SizedBox(
           width: 25,
         ),
-        OnboardingBtn(
-            btnTitle: 'Back', btnColor: AppColor.black, btnFun: goToLastPage),
+        pageNum == 1 || pageNum == 2
+            ? OnboardingBtn(
+                btnTitle: 'Back',
+                btnColor: AppColor.black,
+                btnFun: goToLastPage)
+            : const SizedBox(
+                width: 16,
+              ),
         const Spacer(),
         SmoothPageIndicator(
           controller: _controller,
@@ -116,11 +126,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           onDotClicked: (index) => _controller.animateToPage(index,
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeIn),
-          effect: const ExpandingDotsEffect(
+          effect: ExpandingDotsEffect(
               activeDotColor: AppColor.black,
               dotColor: AppColor.grey,
-              dotWidth: 5,
-              dotHeight: 5,
+              dotWidth: 10,
+              dotHeight: 10,
               spacing: 3),
         ),
         const Spacer(),

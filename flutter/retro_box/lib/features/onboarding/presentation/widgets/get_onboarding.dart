@@ -18,7 +18,7 @@ class GetOnboarding extends StatelessWidget {
       children: [
         SvgPicture.asset(image),
         const SizedBox(
-          height: 40,
+          height: 30,
         ),
         Text(
           title,
@@ -26,7 +26,7 @@ class GetOnboarding extends StatelessWidget {
               color: Colors.black, fontSize: 20, fontWeight: FontWeight.w600),
         ),
         const SizedBox(
-          height: 15,
+          height: 10,
         ),
         Text(
           description,
