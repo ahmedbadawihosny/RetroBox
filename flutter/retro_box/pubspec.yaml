@@ -22,10 +22,10 @@ dependencies:
   firebase_auth: ^5.3.4
   get_it: ^8.0.2
   http: ^1.2.2
+  smooth_page_indicator: ^1.2.0+3
 
 flutter_launcher_icons:
   android: "launcher_icon"
-  ios: true
   image_path: "assets/logo/logo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
