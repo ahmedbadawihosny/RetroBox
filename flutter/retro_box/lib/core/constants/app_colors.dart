@@ -5,6 +5,7 @@ class AppColor {
   static Color secondry = const Color(0xffFFCC4D);
 
   static Color white = Colors.white;
+  static Color grey = Color(0xffE3E3E3);
   static Color black = Colors.black;
 
   static Color playerX = Color(0xff77C164);

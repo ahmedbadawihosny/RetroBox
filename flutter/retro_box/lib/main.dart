@@ -1,6 +1,7 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:retro_box/features/onboarding/presentation/screens/splash_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       builder: DevicePreview.appBuilder,
       // initialRoute: RoutesName.initial,
       // onGenerateRoute: Pages.generate,
-      // home: GameScreen(),
+      home: SplashScreen(),
     );
   }
 }
