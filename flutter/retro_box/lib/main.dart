@@ -5,18 +5,18 @@ import 'package:retro_box/core/routes/app_routes.dart';
 import 'package:retro_box/core/routes/routes_names.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  // WidgetsFlutterBinding.ensureInitialized();
   // await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // setupServiceLocator();
   // await getIt<CacheHelper>().init();
 
-  runApp(
-    DevicePreview(
-      builder: (context) => MyApp(),
-      enabled: !kReleaseMode,
-    ),
-  );
-  // runApp(const MyApp());
+  // runApp(
+  //   DevicePreview(
+  //     builder: (context) => MyApp(),
+  //     enabled: !kReleaseMode,
+  //   ),
+  // );
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -26,11 +26,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Chattie',
+      title: 'RetroBox',
       debugShowCheckedModeBanner: false,
-      locale: DevicePreview.locale(context),
-      builder: DevicePreview.appBuilder,
-      initialRoute: RoutesName.initial,
+      // locale: DevicePreview.locale(context),
+      // builder: DevicePreview.appBuilder,
+      initialRoute: RoutesName.xoHome,
       onGenerateRoute: AppRoute.generate,
     );
   }
