@@ -1,144 +1,80 @@
-// ignore_for_file: no_logic_in_create_state
+// ignore_for_file: no_logic_in_create_state, use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:retro_box/core/constants/app_colors.dart';
 import 'package:retro_box/core/widgets/custom_app_bar.dart';
 import 'package:retro_box/core/widgets/custom_app_btn.dart';
-import 'package:retro_box/features/xo_game/presentation/logic/logic.dart';
-import 'package:retro_box/features/xo_game/presentation/logic/player.dart';
+import 'package:retro_box/features/xo_game/domain/entites/player.dart';
+import 'package:retro_box/features/xo_game/presentation/provider/xo_game_controller.dart';
 import 'package:retro_box/features/xo_game/presentation/widgets/xo_game_score.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
 class XoGameSession extends StatefulWidget {
   final String session;
   const XoGameSession({super.key, required this.session});
 
   @override
-  State<XoGameSession> createState() => _XoGameSessionState(session);
+  State<XoGameSession> createState() => _XoGameSessionState();
 }
 
 class _XoGameSessionState extends State<XoGameSession> {
-  final String session;
-  _XoGameSessionState(this.session);
+  late XoGameController controller;
 
-  List<String> board = List.filled(9, ' ');
-  String winner = '';
-
-  bool isXTurn = true;
-  XoLogic xoLogic = XoLogic();
-
-  // Api methods
-  Future<void> makeAIMove(int position) async {
-    if (board[position] == ' ' && winner == '') {
-      try {
-        setState(() {
-          board[position] = 'X';
-        });
-        final response = await http.get(
-          Uri.parse(
-              'https://retrobox-api.vercel.app/xo/move?position=$position'),
-        );
-        if (response.statusCode == 200) {
-          final data = json.decode(response.body);
-          if (data['board'] != null) {
-            setState(() {
-              board = List<String>.from(data['board']);
-              winner = data['winner'] ?? '';
-            });
-          } else {
-            throw Exception('Invalid response format from server.');
-          }
-        } else {
-          throw Exception(
-              'Server responded with status code ${response.statusCode}');
-        }
-      } catch (e) {
-        // ignore: use_build_context_synchronously
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: Could not make a move.')),
-        );
-      }
-    }
-
-    if (winner != '') {
-      if (winner == 'X') {
-        Player.playerXWin++;
-      } else {
-        Player.playerOWin++;
-      }
-      _showWinnerDialog(winner);
-    } else if (!board.contains(' ')) {
-      _showWinnerDialog('Draw');
-    }
-  }
-
-  // Function to reset the game
-  Future<void> resetAIGame() async {
-    var response = await http.get(
-      Uri.parse('https://retrobox-api.vercel.app/xo/reset'),
-    );
-    var data = json.decode(response.body);
-    setState(() {
-      board = List.from(data['board']);
-      winner = '';
-    });
-  }
-
-  // local logic
-  void resetFriendGame() {
-    setState(() {
-      board = List.filled(9, ' ');
-      isXTurn = true;
-      Player.playerX.clear();
-      Player.playerO.clear();
-    });
-  }
-
-  void newFriendGame() {
-    setState(() {
-      board = List.filled(9, ' ');
-      isXTurn = true;
-      Player.playerXWin = 0;
-      Player.playerOWin = 0;
-      Player.playerX.clear();
-      Player.playerO.clear();
-    });
-  }
-
-  void handleTap(int index) {
-    if (board[index] == ' ') {
-      setState(() {
-        String activePlayer = isXTurn ? Player.x : Player.o;
-        board[index] = activePlayer;
-        xoLogic.playGame(activePlayer, index);
-        String winner = xoLogic.checkWinner();
-        if (winner != '') {
-          _showWinnerDialog(winner);
-        } else if (!board.contains(' ')) {
-          _showWinnerDialog('Draw');
-        }
-        isXTurn = !isXTurn;
+  @override
+  void initState() {
+    super.initState();
+    controller = Provider.of<XoGameController>(context, listen: false);
+    if (widget.session == 'AI_Game') {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        controller.initializeGame();
       });
     }
   }
 
-  void _showWinnerDialog(String winner) {
+  void _showWinnerDialog(BuildContext context, String winner) {
     String message = winner == 'Draw' ? "It's a draw!" : 'Player $winner wins!';
+    if (!mounted) return;
     showDialog(
       context: context,
+      barrierDismissible: false,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('Game Over'),
-          content: Text(message),
+          backgroundColor: AppColor.white,
+          title: Text('Game Over', 
+            style: TextStyle(color: AppColor.black, fontSize: 16, fontWeight: FontWeight.w400),
+          ),
+          content: Text(message,
+            style: TextStyle(color: AppColor.black, fontSize: 20, fontWeight: FontWeight.w500),
+          ),
           actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
+            GestureDetector(
+              onTap: () async {
                 Navigator.of(context).pop();
-                session == 'AI_Game' ? resetAIGame() : resetFriendGame();
+                if (widget.session == 'AI_Game') {
+                  await controller.resetAIGame();
+                } else {
+                  controller.resetFriendGame();
+                }
+                setState(() {});
               },
-              child: const Text('New Game'),
-            ),
+              child: Container(
+                width: 100,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: AppColor.primary,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Center(
+                  child: Text('Play Again',
+                    style: TextStyle(
+                      color: AppColor.black,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ),
+              ),
+            )
           ],
         );
       },
@@ -147,70 +83,91 @@ class _XoGameSessionState extends State<XoGameSession> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColor.white,
-      appBar: customAppBar(
-          barTitle: 'Tic Tac Toe',
-          barIcon: Icons.arrow_back_ios_new_rounded,
-          barFunc: () => Navigator.pop(context)),
-      body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        session == 'AI_Game'
-            ? XoGameScore(
-                secondPlayer: 'bot',
-              )
-            : XoGameScore(
-                secondPlayer: 'Friend',
+    return Consumer<XoGameController>(
+      builder: (context, controller, child) {
+        return Scaffold(
+          backgroundColor: AppColor.white,
+          appBar: customAppBar(
+            barTitle: 'Tic Tac Toe',
+            barIcon: Icons.arrow_back_ios_new_rounded,
+            barFunc: () {
+              Navigator.pop(context);
+              controller.newGame();
+            },
+          ),
+          body: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              widget.session == 'AI_Game'
+                  ? XoGameScore(secondPlayer: 'bot')
+                  : XoGameScore(secondPlayer: 'Friend'),
+              const SizedBox(height: 30),
+              gameBoard(context, controller),
+              const SizedBox(height: 30),
+              CustomAppBtn(
+                btnTitle: 'Reset Game',
+                btnColor: AppColor.primary,
+                btnFun: () async {
+                  if (widget.session == 'AI_Game') {
+                    await controller.resetAIGame();
+                  } else {
+                    controller.resetFriendGame();
+                  }
+                },
               ),
-        const SizedBox(
-          height: 30,
-        ),
-        gameBoard(),
-        const SizedBox(
-          height: 30,
-        ),
-        CustomAppBtn(
-          btnTitle: 'Reset Game',
-          btnColor: AppColor.primary,
-          btnFun: () =>
-              session == 'AI_Game' ? resetAIGame() : resetFriendGame(),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-        CustomAppBtn(
-          btnTitle: 'New Game',
-          btnColor: AppColor.white,
-          btnFun: () => session == 'AI_Game' ? newFriendGame() : resetAIGame(),
-        ),
-        const SizedBox(
-          height: 20,
-        ),
-      ]),
+              const SizedBox(height: 20),
+              CustomAppBtn(
+                btnTitle: 'New Game',
+                btnColor: AppColor.white,
+                btnFun: () => controller.newGame(),
+              ),
+              const SizedBox(height: 20),
+            ],
+          ),
+        );
+      },
     );
   }
 
-  Padding gameBoard() {
+  Padding gameBoard(BuildContext context, XoGameController controller) {
     return Padding(
       padding: const EdgeInsets.all(10.0),
       child: GridView.builder(
-        gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+        ),
         itemCount: 9,
         shrinkWrap: true,
         itemBuilder: (context, index) {
           return GestureDetector(
-            onTap: () =>
-                session == 'AI_Game' ? makeAIMove(index) : handleTap(index),
+            onTap: () async {
+              if (widget.session == 'AI_Game') {
+                if (controller.winner.isEmpty) {
+                  await controller.makeAIMove(index);
+                  if (controller.winner.isNotEmpty) {
+                    _showWinnerDialog(context, controller.winner);
+                  }
+                }
+              } else {
+                if (controller.winner.isEmpty) {
+                  controller.handleTap(index);
+                  if (controller.winner.isNotEmpty) {
+                    _showWinnerDialog(context, controller.winner);
+                  }
+                }
+              }
+            },
             child: Container(
-              margin: EdgeInsets.all(4.0),
+              margin: const EdgeInsets.all(4.0),
               decoration: BoxDecoration(
-                  color: AppColor.xoBoard,
-                  borderRadius: BorderRadius.circular(10)),
+                color: AppColor.xoBoard,
+                borderRadius: BorderRadius.circular(10),
+              ),
               child: Center(
                 child: Text(
-                  board[index],
+                  controller.board[index],
                   style: TextStyle(
-                    color: board[index] == Player.x
+                    color: controller.board[index] == Player.x
                         ? AppColor.playerX
                         : AppColor.playerO,
                     fontSize: 40,

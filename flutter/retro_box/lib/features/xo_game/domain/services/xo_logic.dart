@@ -1,4 +1,4 @@
-import 'package:retro_box/features/xo_game/presentation/logic/player.dart';
+import 'package:retro_box/features/xo_game/domain/entites/player.dart';
 
 class XoLogic {
   void playGame(String activePlayer, int index) {

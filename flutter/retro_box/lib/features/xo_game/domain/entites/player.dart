@@ -1,6 +1,6 @@
 class Player {
-  static const x = 'X';
-  static const o = 'O';
+  static const String x = 'X';
+  static const String o = 'O';
   static const empty = '';
 
   static List<int> playerX = [];

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:retro_box/core/constants/app_assets.dart';
 import 'package:retro_box/core/constants/app_colors.dart';
-import 'package:retro_box/features/xo_game/presentation/logic/player.dart';
+import 'package:retro_box/features/xo_game/domain/entites/player.dart';
 
 class XoGameScore extends StatelessWidget {
   final String secondPlayer;
