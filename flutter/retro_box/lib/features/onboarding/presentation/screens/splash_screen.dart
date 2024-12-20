@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:retro_box/core/constants/app_colors.dart';
 import 'package:retro_box/features/onboarding/presentation/screens/onboarding_screen.dart';
+import 'package:retro_box/features/xo_game/presentation/screens/xo_home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,19 +21,23 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _splashTime() async {
-    // SharedPreferences prefs = await SharedPreferences.getInstance();
-    // bool? hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool? hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+    bool? hasLogin = prefs.getBool('hasLogin') ?? false;
     await Future.delayed(const Duration(seconds: 2));
-    Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const OnboardingScreen()));
 
-    // if (hasSeenOnboarding) {
-    //   Navigator.of(context)
-    //       .pushReplacement(MaterialPageRoute(builder: (_) => const Scaffold()));
-    // } else {
-    //   Navigator.of(context).pushReplacement(
-    //       MaterialPageRoute(builder: (_) => const Placeholder()));
-    // }
+    if (hasSeenOnboarding) {
+      if (hasLogin) {
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const Scaffold()));
+      } else {
+        Navigator.of(context)
+            .pushReplacement(MaterialPageRoute(builder: (_) => const XoHome()));
+      }
+    } else {
+      Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (_) => const OnboardingScreen()));
+    }
   }
 
   @override

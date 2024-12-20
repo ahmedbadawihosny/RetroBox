@@ -9,6 +9,7 @@ import 'package:retro_box/features/onboarding/domain/entities/onboarding_entity.
 import 'package:retro_box/features/onboarding/domain/usecases/view_onboarding.dart';
 import 'package:retro_box/features/onboarding/presentation/widgets/get_onboarding.dart';
 import 'package:retro_box/features/onboarding/presentation/widgets/onboarding_btn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -40,12 +41,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  void _setOnboardingState() {
-    /*
+  void _setOnboardingState() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     prefs.setBool('hasSeenOnboarding', true);
-    */
-    // if (!mounted) return;
+
+    if (!mounted) return;
     Navigator.pushReplacementNamed(
       context,
       RoutesName.xoHome,

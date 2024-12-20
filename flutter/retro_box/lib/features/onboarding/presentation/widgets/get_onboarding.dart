@@ -28,11 +28,18 @@ class GetOnboarding extends StatelessWidget {
         const SizedBox(
           height: 10,
         ),
-        Text(
-          description,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-              color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400),
+        SizedBox(
+          width: 320,
+          child: Wrap(
+            children: [
+            Text(
+              description,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                  color: Colors.black, fontSize: 16, fontWeight: FontWeight.w400),
+            ),
+            ]
+          ),
         )
       ],
     );
