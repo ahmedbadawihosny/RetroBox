@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:retro_box/core/routes/routes_names.dart';
+import 'package:retro_box/features/app/presentation/screens/home.dart';
 import 'package:retro_box/features/onboarding/presentation/screens/onboarding_screen.dart';
 import 'package:retro_box/features/onboarding/presentation/screens/splash_screen.dart';
 import 'package:retro_box/features/xo_game/presentation/screens/xo_game_session.dart';
@@ -15,6 +16,8 @@ class AppRoute {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case RoutesName.onboarding:
         return MaterialPageRoute(builder: (_) => const OnboardingScreen());
+      case RoutesName.home:
+        return MaterialPageRoute(builder: (_) => const Home());
       case RoutesName.xoHome:
         return MaterialPageRoute(builder: (_) => const XoHome());
       case RoutesName.xoRules:

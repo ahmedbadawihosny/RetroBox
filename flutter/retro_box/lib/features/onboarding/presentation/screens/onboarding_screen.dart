@@ -48,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     if (!mounted) return;
     Navigator.pushReplacementNamed(
       context,
-      RoutesName.xoHome,
+      RoutesName.home,
     );
   }
 

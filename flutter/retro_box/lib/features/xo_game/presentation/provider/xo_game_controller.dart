@@ -19,17 +19,16 @@ class XoGameController with ChangeNotifier {
   String winner = '';
   bool isXTurn = true;
   XoLogic xoLogic = XoLogic();
-  bool _hasAwardedPoints = false;
+  // bool _hasAwardedPoints = false;
 
   Future<void> initializeGame() async {
     try {
       final result = await _resetGameUseCase();
-      setState(() {
-        board = result.board;
-        winner = '';
-        isXTurn = true;
-        _hasAwardedPoints = false;
-      });
+      board = result.board;
+      winner = '';
+      isXTurn = true;
+      // _hasAwardedPoints = false;
+      notifyListeners();
     } catch (e) {
       debugPrint('Error initializing game: $e');
     }
@@ -43,9 +42,8 @@ class XoGameController with ChangeNotifier {
       xoLogic.playGame(activePlayer, index);
       
       String result = xoLogic.checkWinner();
-      if (result.isNotEmpty && !_hasAwardedPoints) {
+      if (result.isNotEmpty && winner.isEmpty) {  // Only award points if winner hasn't been set
         winner = result;
-        _hasAwardedPoints = true;
         if (winner == 'X') {
           Player.playerXWin++;
         } else if (winner == 'O') {
@@ -61,60 +59,53 @@ class XoGameController with ChangeNotifier {
   }
 
   void resetFriendGame() {
-    setState(() {
-      board = List.filled(9, ' ');
-      isXTurn = true;
-      winner = '';
-      _hasAwardedPoints = false;
-      xoLogic = XoLogic();
-      Player.playerX.clear();
-      Player.playerO.clear();
-    });
+    board = List.filled(9, ' ');
+    isXTurn = true;
+    winner = '';
+    // _hasAwardedPoints = false;
+    xoLogic = XoLogic();
+    Player.playerX.clear();
+    Player.playerO.clear();
+    notifyListeners();
   }
 
   void newGame() {
-    setState(() {
-      board = List.filled(9, ' ');
-      isXTurn = true;
-      winner = '';
-      _hasAwardedPoints = false;
-      Player.playerXWin = 0;
-      Player.playerOWin = 0;
-      Player.playerX.clear();
-      Player.playerO.clear();
-      xoLogic = XoLogic();
-    });
+    board = List.filled(9, ' ');
+    isXTurn = true;
+    winner = '';
+    // _hasAwardedPoints = false;
+    Player.playerXWin = 0;
+    Player.playerOWin = 0;
+    Player.playerX.clear();
+    Player.playerO.clear();
+    xoLogic = XoLogic();
+    notifyListeners();
   }
 
   // AI game methods
   Future<void> makeAIMove(int position) async {
     if (board[position] == ' ' && winner.isEmpty) {
       try {
-        setState(() {
-          board[position] = 'X';
-        });
+        board[position] = 'X';
+        notifyListeners();
 
         final result = await _makeAIMoveUseCase(position);
         
-        setState(() {
-          board = result.board;
+        board = result.board;
+        
+        if (result.winner.isNotEmpty && winner.isEmpty) {  // Only award points if winner hasn't been set
           winner = result.winner;
-          
-          if (winner.isNotEmpty && !_hasAwardedPoints) {
-            _hasAwardedPoints = true;
-            if (winner == 'X') {
-              Player.playerXWin++;
-            }
-            if (winner == 'O') {
-              Player.playerOWin++;
-            }
+          if (winner == 'X') {
+            Player.playerXWin++;
+          } else if (winner == 'O') {
+            Player.playerOWin++;
           }
-        });
+        }
+        notifyListeners();
       } catch (e) {
         debugPrint('Error making AI move: $e');
-        setState(() {
-          board[position] = ' ';
-        });
+        board[position] = ' ';
+        notifyListeners();
       }
     }
   }
@@ -122,19 +113,13 @@ class XoGameController with ChangeNotifier {
   Future<void> resetAIGame() async {
     try {
       final result = await _resetGameUseCase();
-      setState(() {
-        board = result.board;
-        winner = '';
-        isXTurn = true;
-        _hasAwardedPoints = false;
-      });
+      board = result.board;
+      winner = '';
+      isXTurn = true;
+      // _hasAwardedPoints = false;
+      notifyListeners();
     } catch (e) {
       debugPrint('Error resetting AI game: $e');
     }
-  }
-
-  void setState(Function() fn) {
-    fn();
-    notifyListeners();
   }
 }
